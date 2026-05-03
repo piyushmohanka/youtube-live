@@ -11,8 +11,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg wget
+
+      - name: Download Video
+        run: |
+          wget -O video.mp4 "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6T1-kgkoSEm"
 
       - name: Start Streaming
         run: |
-          ffmpeg -re -stream_loop -1 -i "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6T1-kgkoSEm" -c:v libx264 -preset veryfast -b:v 3000k -maxrate 3000k -bufsize 6000k -pix_fmt yuv420p -g 50 -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://a.rtmp.youtube.com/live2/${{ secrets.STREAM_KEY }}"
+          ffmpeg -re -stream_loop -1 -i video.mp4 -c:v libx264 -preset veryfast -b:v 2500k -maxrate 2500k -bufsize 5000k -pix_fmt yuv420p -g 50 -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://a.rtmp.youtube.com/live2/${{ secrets.STREAM_KEY }}"
