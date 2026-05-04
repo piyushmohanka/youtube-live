@@ -1,25 +1,7 @@
-name: 24/7 Shorts Stream
-
-on:
-  workflow_dispatch:
-
-jobs:
-  stream:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Install FFmpeg and yt-dlp
+- name: Start Streaming
         run: |
-          sudo apt-get update && sudo apt-get install -y ffmpeg
-          sudo wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp
-          sudo chmod a+rx /usr/local/bin/yt-dlp
-
-      - name: Download Real Video bypassing Drive Warning
-        run: |
-          yt-dlp "https://drive.google.com/file/d/1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm/view" -o "video.mp4"
-
-      - name: Start Streaming
-        run: |
-          ffmpeg -re -stream_loop -1 -i video.mp4 -vf "scale=ih*9/16:ih,scale=1080:1920,setsar=1" -c:v libx264 -preset veryfast -b:v 2500k -maxrate 2500k -bufsize 5000k -pix_fmt yuv420p -g 50 -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://a.rtmp.youtube.com/live2/${{ secrets.STREAM_KEY }}"
+          ffmpeg -re -stream_loop -1 -i video.mp4 -vf "scale=ih*9/16:ih,scale=1080:1920,setsar=1" \
+          -c:v libx264 -preset veryfast -b:v 2500k -maxrate 2500k -bufsize 5000k \
+          -pix_fmt yuv420p -g 50 -c:a aac -b:a 128k -ar 44100 \
+          -f flv -flvflags no_duration_filesize \
+          "rtmp://a.rtmp.youtube.com/live2/${{ secrets.STREAM_KEY }}"
