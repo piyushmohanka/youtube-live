@@ -10,12 +10,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install FFmpeg and Curl
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg curl
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Download Video File
+      - name: Download Video from Drive
         run: |
-          curl -L "https://limewire.com/d/4UTsT#4qEdJkQ61M" -o video.mp4
+          curl -L "https://docs.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm" -o video.mp4
 
       - name: Start Streaming
         run: |
