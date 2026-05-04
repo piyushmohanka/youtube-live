@@ -1,4 +1,4 @@
-name: 24/7 Guaranteed Stream
+name: 24/7 Final Guaranteed Stream
 
 on:
   workflow_dispatch:
@@ -25,7 +25,7 @@ jobs:
       - name: Start Streaming
         run: |
           ffmpeg -re -stream_loop -1 -i video.mp4 \
-          -vf "scale=1280:720" -c:v libx264 -preset ultrafast -tune zerolatency \
-          -b:v 1500k -maxrate 1500k -bufsize 3000k -g 60 \
-          -c:a aac -b:a 128k -ar 44100 \
+          -vf "scale=854:480" -c:v libx264 -preset ultrafast -tune zerolatency \
+          -b:v 1200k -maxrate 1200k -bufsize 2400k -g 60 \
+          -pix_fmt yuv420p -c:a aac -b:a 96k -ar 44100 \
           -f flv "rtmps://a.rtmp.youtube.com:443/live2/${{ secrets.STREAM_KEY }}"
