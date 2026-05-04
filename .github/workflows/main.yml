@@ -1,4 +1,4 @@
-name: 24/7 High-Quality Stream
+name: 24/7 Piyush Gamer Stable
 
 on:
   workflow_dispatch:
@@ -25,7 +25,7 @@ jobs:
       - name: Start Streaming
         run: |
           ffmpeg -re -stream_loop -1 -i video.mp4 \
-          -c:v libx264 -preset veryfast -tune zerolatency -b:v 2500k -maxrate 2500k -bufsize 5000k \
-          -pix_fmt yuv420p -g 50 -c:a aac -b:a 128k -ar 44100 \
+          -c:v libx264 -preset ultrafast -tune zerolatency -b:v 1800k -maxrate 1800k -bufsize 3600k \
+          -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 \
           -f flv -flvflags no_duration_filesize \
           "rtmps://a.rtmp.youtube.com:443/live2/${{ secrets.STREAM_KEY }}"
