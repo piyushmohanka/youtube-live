@@ -1,4 +1,4 @@
-name: 24/7 Smooth Stream Final
+name: 24/7 Fixed Loop Stream
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ jobs:
 
       - name: Start Streaming
         run: |
-          ffmpeg -re -i video.mp4 -stream_loop -1 \
+          ffmpeg -re -stream_loop -1 -i video.mp4 \
           -c:v libx264 -preset ultrafast -tune zerolatency -b:v 1500k -maxrate 1500k -bufsize 3000k \
           -pix_fmt yuv420p -g 50 -c:a aac -b:a 128k -ar 44100 \
           -f flv -flvflags no_duration_filesize \
