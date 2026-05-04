@@ -1,4 +1,4 @@
-name: 24/7 Shorts Stream
+name: 24/7 Shorts Stream Fix
 
 on:
   workflow_dispatch:
@@ -19,4 +19,4 @@ jobs:
 
       - name: Start Streaming
         run: |
-          ffmpeg -re -stream_loop -1 -i video.mp4 -vf "scale=ih*9/16:ih,scale=1080:1920,setsar=1" -c:v libx264 -preset veryfast -b:v 2500k -maxrate 2500k -bufsize 5000k -pix_fmt yuv420p -g 50 -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://a.rtmp.youtube.com/live2/${{ secrets.STREAM_KEY }}"
+          ffmpeg -re -stream_loop -1 -i video.mp4 -vf "scale=ih*9/16:ih,scale=1080:1920,setsar=1" -c:v libx264 -preset veryfast -b:v 2000k -maxrate 2000k -bufsize 4000k -pix_fmt yuv420p -g 50 -c:a aac -b:a 128k -ar 44100 -f flv "rtmp://a.rtmp.youtube.com/live2/${{ secrets.STREAM_KEY }}"
