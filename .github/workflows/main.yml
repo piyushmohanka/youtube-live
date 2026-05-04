@@ -1,4 +1,4 @@
-name: 24/7 Force Stream Fix
+name: 24/7 Zero Loop-Lag Stream
 
 on:
   workflow_dispatch:
@@ -18,12 +18,11 @@ jobs:
 
       - name: Download Video
         run: |
-          yt-dlp "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm" -o video.mp4
+          yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm" -o video.mp4
 
       - name: Start Streaming
         run: |
-          ffmpeg -re -stream_loop -1 -i video.mp4 \
-          -c:v libx264 -preset ultrafast -tune zerolatency -b:v 1800k \
-          -maxrate 1800k -bufsize 3600k -g 60 -keyint_min 60 \
-          -pix_fmt yuv420p -c:a aac -b:a 128k -ar 44100 \
+          ffmpeg -fflags +genpts -stream_loop -1 -re -i video.mp4 \
+          -c:v libx264 -preset veryfast -b:v 2000k -maxrate 2000k -bufsize 4000k \
+          -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 \
           -f flv "rtmps://a.rtmp.youtube.com:443/live2/${{ secrets.STREAM_KEY }}"
