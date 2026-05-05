@@ -1,10 +1,10 @@
-name: Audio Test with CURL
+name: Simple Stream (No Loop, Just Works)
 
 on:
   workflow_dispatch:
 
 jobs:
-  stream-test:
+  stream:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -13,16 +13,17 @@ jobs:
       - name: Install Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg curl
+          sudo apt-get install -y ffmpeg
+          pip install yt-dlp
 
-      - name: Download Video with CURL (More Reliable)
+      - name: Download Your Video
         run: |
-          curl -L -o video.mp4 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm" -o video.mp4
 
-      - name: Start Streaming TEST VIDEO
+      - name: Start Streaming (One Time Only)
         run: |
-          ffmpeg -re -stream_loop -1 -i video.mp4 \
+          ffmpeg -re -i video.mp4 \
           -vf "crop=ih*9/16:ih,scale=720:1280,format=yuv420p" \
-          -c:v libx264 -preset ultrafast -r 30 -g 60 -b:v 3000k \
-          -af "aresample=async=1" -c:a aac -ar 44100 -b:a 128k \
+          -c:v libx264 -preset ultrafast -b:v 2500k \
+          -c:a aac -ar 44100 -b:a 128k \
           -f flv "rtmps://a.rtmp.youtube.com:443/live2/${{ secrets.STREAM_KEY }}"
