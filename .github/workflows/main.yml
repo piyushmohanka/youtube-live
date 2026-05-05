@@ -1,4 +1,4 @@
-name: Audio Test with Standard Video
+name: Audio Test with CURL
 
 on:
   workflow_dispatch:
@@ -10,14 +10,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install Tools (WGET ADDED)
+      - name: Install Tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg wget
+          sudo apt-get install -y ffmpeg curl
 
-      - name: Download STANDARD TEST VIDEO
+      - name: Download Video with CURL (More Reliable)
         run: |
-          wget -O video.mp4 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          curl -L -o video.mp4 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
 
       - name: Start Streaming TEST VIDEO
         run: |
