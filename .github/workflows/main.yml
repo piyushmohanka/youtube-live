@@ -1,4 +1,4 @@
-Name: 24/7 ROBLOX Stream
+name: 24-7-Stream
 
 on:
   workflow_dispatch:
@@ -7,10 +7,9 @@ jobs:
   stream:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Tools
+      - name: Install Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
@@ -20,6 +19,10 @@ jobs:
         run: |
           yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm" -o video.mp4
 
-      - name: Start Streaming
+      - name: Start Stream
         run: |
-          ffmpeg -re -stream_loop -1 -i video.mp4 -c:v copy -c:a aac -b:a 128k -ar 44100 -af "aresample=async=1" -f flv "rtmps://a.rtmp.youtube.com:443/live2/${{ secrets.STREAM_KEY }}"
+          ffmpeg -re -stream_loop -1 -i video.mp4 \
+          -vf "crop=ih*9/16:ih,scale=720:1280,format=yuv420p" \
+          -c:v libx264 -preset ultrafast -r 30 -g 60 -b:v 3000k -maxrate 3000k -bufsize 6000k \
+          -af "aresample=async=1" -c:a aac -ar 44100 -b:a 128k \
+          -f flv "rtmps://a.rtmp.youtube.com:443/live2/${{ secrets.STREAM_KEY }}"
