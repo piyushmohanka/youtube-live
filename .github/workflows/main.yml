@@ -1,4 +1,4 @@
-name: 24/7 Shorts Feed Stream (Stable)
+name: 24/7 Shorts Feed Stream
 
 on:
   workflow_dispatch:
@@ -20,16 +20,11 @@ jobs:
         run: |
           yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm" -o video.mp4
 
-      - name: STEP 1: Prepare Video for Streaming
+      - name: Start Streaming (Single Stable Command)
         run: |
-          ffmpeg -i video.mp4 \
+          ffmpeg -re -stream_loop -1 -i video.mp4 \
           -vf "crop=ih*9/16:ih,scale=720:1280,format=yuv420p" \
-          -c:v libx264 -preset ultrafast -b:v 3000k -maxrate 3000k -bufsize 6000k -r 30 -g 60 \
+          -af "aresample=async=1" \
+          -c:v libx264 -preset ultrafast -r 30 -g 60 -b:v 3000k -maxrate 3000k -bufsize 6000k \
           -c:a aac -b:a 128k -ar 44100 \
-          stream_ready.mp4
-
-      - name: STEP 2: Start Streaming the Prepared Video
-        run: |
-          ffmpeg -re -stream_loop -1 -i stream_ready.mp4 \
-          -c copy \
           -f flv "rtmps://a.rtmp.youtube.com:443/live2/${{ secrets.STREAM_KEY }}"
