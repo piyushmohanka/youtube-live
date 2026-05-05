@@ -1,4 +1,4 @@
-name: 24/7 Zero Loop-Lag Stream
+name: 24/7 Shorts Feed Stream
 
 on:
   workflow_dispatch:
@@ -23,6 +23,7 @@ jobs:
       - name: Start Streaming
         run: |
           ffmpeg -fflags +genpts -stream_loop -1 -re -i video.mp4 \
+          -vf "crop=ih*9/16:ih,scale=720:1280" \
           -c:v libx264 -preset veryfast -b:v 2000k -maxrate 2000k -bufsize 4000k \
           -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 \
           -f flv "rtmps://a.rtmp.youtube.com:443/live2/${{ secrets.STREAM_KEY }}"
