@@ -1,9 +1,7 @@
-name: 24/7 Shorts Feed Stream
+name: 24/7 Shorts Feed Stream (Stable)
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 */6 * * *' # Har 6 ghante mein auto-restart hoga 24/7 ke liye
 
 jobs:
   stream:
@@ -20,15 +18,18 @@ jobs:
 
       - name: Download Video
         run: |
-          # Google Drive link ko download karne ka zyada behtar tarika
-          yt-dlp --no-check-certificate "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm" -o video.mp4
+          yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm" -o video.mp4
 
-      - name: Start Streaming
+      - name: STEP 1: Prepare Video for Streaming
         run: |
-          # 6 hours ka timeout taaki workflow block na ho
-          timeout 6h ffmpeg -fflags +genpts -stream_loop -1 -re -i video.mp4 \
-          -vf "crop=ih*9/16:ih,scale=720:1280" \
-          -af "aresample=async=1" \
-          -c:v libx264 -preset ultrafast -b:v 3000k -maxrate 3000k -bufsize 6000k \
-          -pix_fmt yuv420p -g 60 -c:a aac -b:a 128k -ar 44100 \
+          ffmpeg -i video.mp4 \
+          -vf "crop=ih*9/16:ih,scale=720:1280,format=yuv420p" \
+          -c:v libx264 -preset ultrafast -b:v 3000k -maxrate 3000k -bufsize 6000k -r 30 -g 60 \
+          -c:a aac -b:a 128k -ar 44100 \
+          stream_ready.mp4
+
+      - name: STEP 2: Start Streaming the Prepared Video
+        run: |
+          ffmpeg -re -stream_loop -1 -i stream_ready.mp4 \
+          -c copy \
           -f flv "rtmps://a.rtmp.youtube.com:443/live2/${{ secrets.STREAM_KEY }}"
