@@ -1,4 +1,4 @@
-name: 24-7-Stream
+name: 24/7 Stream (The Real Fix)
 
 on:
   workflow_dispatch:
@@ -7,22 +7,33 @@ jobs:
   stream:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: Install Tools
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
           pip install yt-dlp
 
-      - name: Download Video
+      - name: Download and Prepare Short Video
         run: |
+          # Download original video
           yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm" -o video.mp4
+          
+          # Create a perfectly formatted, cropped, short video
+          ffmpeg -i video.mp4 -vf "crop=ih*9/16:ih,scale=720:1280,format=yuv420p" -c:v libx264 -preset ultrafast -b:v 3000k -r 30 -g 60 -c:a aac -ar 44100 -b:a 128k ready_video.mp4
 
-      - name: Start Stream
+      - name: Create a Very Long Video File (No more looping bug!)
         run: |
-          ffmpeg -re -stream_loop -1 -i video.mp4 \
-          -vf "crop=ih*9/16:ih,scale=720:1280,format=yuv420p" \
-          -c:v libx264 -preset ultrafast -r 30 -g 60 -b:v 3000k -maxrate 3000k -bufsize 6000k \
-          -af "aresample=async=1" -c:a aac -ar 44100 -b:a 128k \
+          # Create a list file to loop the video 100 times
+          for i in {1..100}; do echo "file 'ready_video.mp4'"; done > list.txt
+          
+          # Concatenate the video to make one long file
+          ffmpeg -f concat -safe 0 -i list.txt -c copy long_video.mp4
+
+      - name: Start Streaming the Long Video (NO LOOP)
+        run: |
+          ffmpeg -re -i long_video.mp4 \
+          -c copy \
           -f flv "rtmps://a.rtmp.youtube.com:443/live2/${{ secrets.STREAM_KEY }}"
