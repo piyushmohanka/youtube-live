@@ -10,14 +10,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install Tools
+      - name: Install Tools (WGET ADDED)
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg
+          sudo apt-get install -y ffmpeg wget
 
       - name: Download STANDARD TEST VIDEO
         run: |
-          # Standard test video download
           wget -O video.mp4 "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
 
       - name: Start Streaming TEST VIDEO
