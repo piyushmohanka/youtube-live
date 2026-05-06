@@ -17,10 +17,12 @@ jobs:
 
       - name: Download Video
         run: |
-          yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4" "https://drive.google.com/uc?export=download&id=1OFKIBggSKZUyJsuniPz0H6Tl-kgkoSEm" -o video.mp4
+          # Naya Google Drive ID yahan update kar diya gaya hai
+          yt-dlp -f "best[ext=mp4]" "https://drive.google.com/uc?export=download&id=1bHTPXbZ5hIBxqkAp_TDTooaFdnhXQtgx" -o video.mp4
 
       - name: Start Stream
         run: |
+          # Loop, Audio Sync aur Vertical Format ka fix yahan hai
           ffmpeg -re -stream_loop -1 -i video.mp4 \
           -vf "crop=ih*9/16:ih,scale=720:1280,format=yuv420p" \
           -c:v libx264 -preset ultrafast -r 30 -g 60 -b:v 3000k -maxrate 3000k -bufsize 6000k \
